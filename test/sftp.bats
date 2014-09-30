@@ -3,6 +3,8 @@
 teardown() {
   deluser aptible || true
   pkill sshd || true
+  pkill rsyslogd || true
+  pkill tail || true
 }
 
 @test "It should install sshd " {

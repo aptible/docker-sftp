@@ -22,4 +22,6 @@ mkdir -p /home/$USERNAME/sftp
 chown $USERNAME /home/$USERNAME/sftp
 chmod go-rwx /home/$USERNAME/sftp
 
-/usr/sbin/sshd -D
+rsyslogd
+/usr/sbin/sshd
+tail -f /var/log/auth.log
