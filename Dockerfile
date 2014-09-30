@@ -11,7 +11,7 @@ RUN chmod +x /usr/bin/start-sftp-server
 
 VOLUME /home
 
-EXPOSE 2222
+EXPOSE 22
 
 # Integration tests
 RUN apt-get -y install sshpass
