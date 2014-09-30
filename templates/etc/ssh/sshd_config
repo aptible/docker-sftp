@@ -36,7 +36,4 @@ TCPKeepAlive yes
 UsePAM no
 
 Subsystem sftp internal-sftp
-
-Match Group sftpusers
-  ChrootDirectory /home/%u
-  AllowTcpForwarding no
+AllowTcpForwarding no

@@ -1,7 +1,7 @@
 FROM quay.io/aptible/ubuntu:14.04
 
 RUN apt-get update
-RUN apt-get -y install openssh-server
+RUN apt-get -y install openssh-server rssh
 RUN mkdir -p /var/run/sshd
 
 ADD templates/etc /etc

@@ -14,13 +14,12 @@ fi
 id $USERNAME &> /dev/null || useradd $USERNAME
 adduser $USERNAME sftpusers
 echo -e "$PASSWORD\n$PASSWORD" | passwd $USERNAME
-usermod -d /sftp $USERNAME
-usermod -s /usr/sbin/nologin $USERNAME
+usermod -d /home/$USERNAME $USERNAME
+usermod -s /usr/bin/rssh $USERNAME
 
 # Set up home directory
-mkdir -p /home/$USERNAME/sftp
-chown $USERNAME /home/$USERNAME/sftp
-chmod go-rwx /home/$USERNAME/sftp
+mkdir -p /home/$USERNAME
+chown $USERNAME /home/$USERNAME
 
 rsyslogd
 /usr/sbin/sshd
