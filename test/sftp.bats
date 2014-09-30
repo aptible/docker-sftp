@@ -1,5 +1,9 @@
 #!/usr/bin/env bats
 
+setup() {
+  export SSH_OPTS="-o StrictHostKeyChecking=no -o Port=2222"
+}
+
 teardown() {
   deluser aptible || true
   pkill sshd || true
@@ -21,7 +25,7 @@ teardown() {
 @test "It should set USERNAME and PASSWORD" {
   USERNAME=aptible PASSWORD=password /usr/bin/start-sftp-server &
   sleep 0.25
-  sshpass -p password sftp -o StrictHostKeyChecking=no aptible@localhost << EOF
+  sshpass -p password sftp $SSH_OPTS aptible@localhost << EOF
     ls
 EOF
 }
@@ -30,8 +34,7 @@ EOF
   touch $BATS_TMPDIR/ok
   USERNAME=aptible PASSWORD=password /usr/bin/start-sftp-server &> /dev/null &
   sleep 0.25
-  run sshpass -p password scp -o StrictHostKeyChecking=no \
-    $BATS_TMPDIR/ok aptible@localhost:
+  run sshpass -p password scp $SSH_OPTS $BATS_TMPDIR/ok aptible@localhost:
   [[ "$status" -eq "0" ]]
   [[ -e /home/aptible/ok ]]
   rm /home/aptible/ok
@@ -39,6 +42,6 @@ EOF
 
 @test "It should disallow SSH" {
   USERNAME=aptible PASSWORD=password /usr/bin/start-sftp-server &
-  run sshpass -p password ssh -o StrictHostKeyChecking=no aptible@localhost
+  run sshpass -p password ssh $SSH_OPTS aptible@localhost
   [[ "$status" -ne "0" ]]
 }
