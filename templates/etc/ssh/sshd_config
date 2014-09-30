@@ -1,0 +1,42 @@
+Port 22
+Protocol 2
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_dsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+UsePrivilegeSeparation yes
+
+KeyRegenerationInterval 3600
+ServerKeyBits 768
+
+SyslogFacility AUTH
+LogLevel INFO
+
+LoginGraceTime 120
+PermitRootLogin no
+StrictModes yes
+
+PermitUserEnvironment yes
+
+RSAAuthentication no
+PubkeyAuthentication no
+PasswordAuthentication yes
+
+IgnoreRhosts yes
+RhostsRSAAuthentication no
+HostbasedAuthentication no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+
+X11Forwarding yes
+X11DisplayOffset 10
+PrintMotd no
+PrintLastLog no
+TCPKeepAlive yes
+
+UsePAM no
+
+Subsystem sftp internal-sftp
+
+Match Group sftpusers
+  ChrootDirectory /home/%u
+  AllowTcpForwarding no

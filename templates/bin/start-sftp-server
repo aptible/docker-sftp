@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -e
+
+# Initial setup
+groupadd sftpusers || true
+
+if [ -z "$USERNAME" ] || [ -z $PASSWORD ]; then
+  echo '$USERNAME and $PASSWORD must be set. Exiting!'
+  exit 1
+fi
+
+# Generate user from $USERNAME / $PASSWORD
+id $USERNAME &> /dev/null || useradd $USERNAME
+adduser $USERNAME sftpusers
+echo -e "$PASSWORD\n$PASSWORD" | passwd $USERNAME
+usermod -d /sftp $USERNAME
+usermod -s /usr/sbin/nologin $USERNAME
+
+# Set up home directory
+mkdir -p /home/$USERNAME/sftp
+chown $USERNAME /home/$USERNAME/sftp
+chmod go-rwx /home/$USERNAME/sftp
+
+/usr/sbin/sshd -D
