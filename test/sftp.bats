@@ -20,7 +20,7 @@ teardown() {
 
 @test "It should set USERNAME and PASSWORD" {
   USERNAME=aptible PASSWORD=password /usr/bin/start-sftp-server &
-  sleep 0.25
+  sleep 1
   sshpass -p password sftp -o StrictHostKeyChecking=no aptible@localhost << EOF
     ls
 EOF
@@ -29,7 +29,7 @@ EOF
 @test "It should allow SCP" {
   touch $BATS_TMPDIR/ok
   USERNAME=aptible PASSWORD=password /usr/bin/start-sftp-server &> /dev/null &
-  sleep 0.25
+  sleep 1
   run sshpass -p password scp -o StrictHostKeyChecking=no \
     $BATS_TMPDIR/ok aptible@localhost:
   [[ "$status" -eq "0" ]]
@@ -39,6 +39,7 @@ EOF
 
 @test "It should disallow SSH" {
   USERNAME=aptible PASSWORD=password /usr/bin/start-sftp-server &
+  sleep 1
   run sshpass -p password ssh -o StrictHostKeyChecking=no aptible@localhost
   [[ "$status" -ne "0" ]]
 }
