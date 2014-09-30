@@ -15,7 +15,7 @@ OpenSSH-based SFTP on Docker.
 
 ## Available Tags
 
-* `latest`: Currently OpenSSH ...
+* `latest`: Currently OpenSSH 6.6.1p1
 
 ## Tests
 
