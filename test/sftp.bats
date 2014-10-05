@@ -24,7 +24,7 @@ teardown() {
 
 @test "It should set ADMIN_USER and PASSWORD" {
   ADMIN_USER=admin PASSWORD=password /usr/bin/start-sftp-server &
-  sleep 1
+  sleep 2
   sshpass -p password sftp -o StrictHostKeyChecking=no admin@localhost << EOF
     ls
 EOF
@@ -33,7 +33,7 @@ EOF
 @test "It should allow SCP for admins" {
   touch $BATS_TMPDIR/ok
   ADMIN_USER=admin PASSWORD=password /usr/bin/start-sftp-server &
-  sleep 1
+  sleep 2
   run sshpass -p password scp -o StrictHostKeyChecking=no \
     $BATS_TMPDIR/ok admin@localhost:
   [[ "$status" -eq "0" ]]
@@ -43,14 +43,14 @@ EOF
 
 @test "It should allow SSH for admins" {
   ADMIN_USER=admin PASSWORD=password /usr/bin/start-sftp-server &
-  sleep 1
+  sleep 2
   run sshpass -p password ssh -o StrictHostKeyChecking=no admin@localhost
   [[ "$status" -eq "0" ]]
 }
 
 @test "It should allow sudo for admins" {
   ADMIN_USER=admin PASSWORD=password /usr/bin/start-sftp-server &
-  sleep 1
+  sleep 2
   run sshpass -p password ssh -o StrictHostKeyChecking=no admin@localhost sudo ls
   [[ "$status" -eq "0" ]]
 }
@@ -59,7 +59,7 @@ EOF
   touch $BATS_TMPDIR/ok
   ADMIN_USER=admin PASSWORD=password /usr/bin/start-sftp-server &
   /usr/bin/add-sftp-user test $(cat $BATS_TEST_DIRNAME/test.pub)
-  sleep 1
+  sleep 2
   run scp -i $BATS_TEST_DIRNAME/test -o StrictHostKeyChecking=no \
     $BATS_TMPDIR/ok test@localhost:
   [[ "$status" -eq "0" ]]
@@ -70,7 +70,7 @@ EOF
 @test "It should disallow SSH for regular users" {
   ADMIN_USER=admin PASSWORD=password /usr/bin/start-sftp-server &
   /usr/bin/add-sftp-user test $(cat $BATS_TEST_DIRNAME/test.pub)
-  sleep 1
+  sleep 2
   run ssh -i $BATS_TEST_DIRNAME/test -o StrictHostKeyChecking=no test@localhost
   [[ "$status" -ne "0" ]]
 }
