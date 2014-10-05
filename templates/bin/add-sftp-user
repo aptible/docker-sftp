@@ -1,0 +1,28 @@
+#!/bin/bash
+# add-sftp-user [user] [pubkey]
+
+set -e
+
+if [ $# -lt 2 ]; then
+  echo 'Usage: add-sftp-user [user] [pubkey]'
+  exit 1
+fi
+
+
+user=$1
+shift
+
+id $user &> /dev/null || useradd $user
+adduser $user sftpusers || true
+passwd -d $user
+usermod -d /home/$user $user
+usermod -s /usr/bin/rssh $user
+
+# Set up home directory
+mkdir -p /home/$user
+
+# Add public key
+mkdir -p /home/$user/.ssh
+echo $@ >> /home/$user/.ssh/authorized_keys
+chmod -R go-rwx /home/$user/.ssh
+chown -R $user:$user /home/$user

@@ -1,25 +1,14 @@
 #!/bin/bash
+# start-sftp-server
 
 set -e
 
-# Initial setup
-groupadd sftpusers || true
-
-if [ -z "$USERNAME" ] || [ -z $PASSWORD ]; then
-  echo '$USERNAME and $PASSWORD must be set. Exiting!'
+if [ -z "$ADMIN_USER" ] || [ -z $PASSWORD ]; then
+  echo '$ADMIN_USER and $PASSWORD must be set. Exiting!'
   exit 1
 fi
 
-# Generate user from $USERNAME / $PASSWORD
-id $USERNAME &> /dev/null || useradd $USERNAME
-adduser $USERNAME sftpusers
-echo $USERNAME:$PASSWORD | chpasswd
-usermod -d /home/$USERNAME $USERNAME
-usermod -s /usr/bin/rssh $USERNAME
-
-# Set up home directory
-mkdir -p /home/$USERNAME
-chown $USERNAME /home/$USERNAME
+add-privileged-user $ADMIN_USER $PASSWORD
 
 rsyslogd
 /usr/sbin/sshd

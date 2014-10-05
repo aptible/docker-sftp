@@ -1,0 +1,17 @@
+#!/bin/bash
+# add-privileged-user [user] [password]
+
+set -e
+
+if [ "$#" -ne "2" ]; then
+  echo 'Usage: add-sftp-user [user] [password]'
+  exit 1
+fi
+
+user=$1
+password=$2
+
+# Generate user from user / password
+id $user &> /dev/null || adduser $user --disabled-password --gecos "Admin"
+adduser $user sudo || true
+echo $user:$password | chpasswd

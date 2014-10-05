@@ -15,10 +15,10 @@ LoginGraceTime 120
 PermitRootLogin no
 StrictModes yes
 
-PermitUserEnvironment yes
+PermitUserEnvironment no
 
-RSAAuthentication no
-PubkeyAuthentication no
+RSAAuthentication yes
+PubkeyAuthentication yes
 PasswordAuthentication yes
 
 IgnoreRhosts yes
@@ -27,7 +27,7 @@ HostbasedAuthentication no
 PermitEmptyPasswords no
 ChallengeResponseAuthentication no
 
-X11Forwarding yes
+X11Forwarding no
 X11DisplayOffset 10
 PrintMotd no
 PrintLastLog no
