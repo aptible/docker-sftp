@@ -1,0 +1,12 @@
+#!/bin/bash
+# restore-sftp-users
+
+set -e
+
+for user in $(ls -1 /home); do
+  id $user &> /dev/null || useradd $user
+  adduser $user sftpusers || true
+  passwd -d $user
+  usermod -d /home/$user $user
+  usermod -s /usr/bin/rssh $user
+done

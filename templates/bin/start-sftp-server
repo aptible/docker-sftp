@@ -21,6 +21,7 @@ if [ ! -f /etc/ssh/keys/ssh_host_dsa_key ]; then
   ssh-keygen -f /etc/ssh/keys/ssh_host_dsa_key -N '' -t dsa
 fi
 
+restore-sftp-users
 add-privileged-user $ADMIN_USER $PASSWORD
 
 rsyslogd

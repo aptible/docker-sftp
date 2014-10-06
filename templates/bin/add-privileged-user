@@ -13,5 +13,6 @@ password=$2
 
 # Generate user from user / password
 id $user &> /dev/null || adduser $user --disabled-password --gecos "Admin"
-adduser $user sudo || true
+usermod -G $user,sudo $user
+usermod -s /bin/bash $user
 echo $user:$password | chpasswd

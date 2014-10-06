@@ -9,6 +9,7 @@ teardown() {
 
   rm -rf /home/admin
   rm -rf /home/test
+  rm -f /var/log/auth.log
 }
 
 @test "It should install sshd " {
