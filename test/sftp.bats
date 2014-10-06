@@ -17,7 +17,7 @@ teardown() {
 
 wait_for_sftp() {
   ADMIN_USER=admin PASSWORD=password /usr/bin/start-sftp-server &
-  while  ! pgrep tail ; do sleep 0.1; done
+  while ! pgrep tail ; do sleep 0.1; done
 }
 
 @test "It should install sshd " {
@@ -61,6 +61,7 @@ EOF
 }
 
 @test "It should allow SCP for regular users" {
+  skip
   touch $BATS_TMPDIR/ok
   wait_for_sftp
   /usr/bin/add-sftp-user test $(cat $BATS_TEST_DIRNAME/test.pub)
