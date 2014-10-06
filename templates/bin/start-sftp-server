@@ -26,4 +26,7 @@ add-privileged-user $ADMIN_USER $PASSWORD
 
 rsyslogd
 /usr/sbin/sshd
+
+# Wait for /var/log/auth.log to exist, then tail it
+while [ ! -f /var/log/auth.log ] ; do sleep 0.1; done
 tail -f /var/log/auth.log
