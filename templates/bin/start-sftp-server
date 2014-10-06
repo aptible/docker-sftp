@@ -3,6 +3,19 @@
 
 set -e
 
+# Generate SSH host keys
+if [ ! -f /etc/ssh/ssh_host_ecdsa_key ]; then
+  ssh-keygen -f /etc/ssh/ssh_host_ecdsa_key -N '' -t ecdsa
+fi
+
+if [ ! -f /etc/ssh/ssh_host_rsa_key ]; then
+  ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa
+fi
+
+if [ ! -f /etc/ssh/ssh_host_dsa_key ]; then
+  ssh-keygen -f /etc/ssh/ssh_host_dsa_key -N '' -t dsa
+fi
+
 if [ -z "$ADMIN_USER" ] || [ -z $PASSWORD ]; then
   echo '$ADMIN_USER and $PASSWORD must be set. Exiting!'
   exit 1

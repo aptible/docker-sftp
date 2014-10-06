@@ -5,6 +5,7 @@ RUN apt-get -y install openssh-server rssh sudo
 RUN mkdir -p /var/run/sshd
 RUN groupadd sftpusers
 RUN chmod +s /usr/bin/sudo
+RUN rm /etc/ssh/*_key /etc/ssh/*_key.pub
 
 ADD templates/etc /etc
 
@@ -19,5 +20,8 @@ EXPOSE 22
 RUN apt-get -y install sshpass
 ADD test /tmp/test
 RUN bats /tmp/test
+
+# Delete test host keys
+RUN rm /etc/ssh/*_key /etc/ssh/*_key.pub
 
 CMD /usr/bin/start-sftp-server
