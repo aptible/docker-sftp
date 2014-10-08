@@ -4,7 +4,7 @@
 set -e
 
 if [ "$#" -ne "2" ]; then
-  echo 'Usage: add-sftp-user [user] [password]'
+  echo 'Usage: add-privileged-user [user] [password]'
   exit 1
 fi
 
@@ -13,6 +13,7 @@ password=$2
 
 # Generate user from user / password
 id $user &> /dev/null || adduser $user --disabled-password --gecos "Admin"
+chmod -R go-rwx /home/$user
 usermod -G $user,sudo $user
 usermod -s /bin/bash $user
 echo $user:$password | chpasswd
