@@ -5,6 +5,9 @@ HostKey /etc/ssh/keys/ssh_host_dsa_key
 HostKey /etc/ssh/keys/ssh_host_ecdsa_key
 UsePrivilegeSeparation yes
 
+# http://www.doublecloud.org/2013/06/slow-ssh-client-and-quick-hack/
+UseDNS no
+
 KeyRegenerationInterval 3600
 ServerKeyBits 768
 
@@ -37,3 +40,8 @@ UsePAM no
 
 Subsystem sftp internal-sftp
 AllowTcpForwarding no
+
+Match Group sftpusers
+  ChrootDirectory /home/%u
+  AuthorizedKeysFile /home/%u/.ssh/authorized_keys
+  ForceCommand internal-sftp

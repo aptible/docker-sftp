@@ -60,16 +60,21 @@ EOF
   [[ "$status" -eq "0" ]]
 }
 
-@test "It should allow SCP for regular users" {
-  skip
+@test "It should disallow SCP for regular users" {
   touch $BATS_TMPDIR/ok
   wait_for_sftp
   /usr/bin/add-sftp-user test $(cat $BATS_TEST_DIRNAME/test.pub)
   run scp -i $BATS_TEST_DIRNAME/test -o StrictHostKeyChecking=no \
     $BATS_TMPDIR/ok test@localhost:
-  [[ "$status" -eq "0" ]]
-  [[ -e /home/test/ok ]]
-  rm /home/test/ok
+  [[ "$status" -ne "0" ]]
+}
+
+@test "It should allow SFTP for regular users" {
+  wait_for_sftp
+  /usr/bin/add-sftp-user test $(cat $BATS_TEST_DIRNAME/test.pub)
+  sftp -i $BATS_TEST_DIRNAME/test -o StrictHostKeyChecking=no test@localhost << EOF
+    ls
+EOF
 }
 
 @test "It should disallow SSH for regular users" {

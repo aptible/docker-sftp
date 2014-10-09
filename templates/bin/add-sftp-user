@@ -15,14 +15,17 @@ shift
 id $user &> /dev/null || useradd $user
 adduser $user sftpusers || true
 passwd -d $user
-usermod -d /home/$user $user
-usermod -s /usr/bin/rssh $user
+usermod -d /sftp $user
 
 # Set up home directory
 mkdir -p /home/$user
 
+# Make chroot subdirectory
+mkdir -p /home/$user/sftp
+chown -R $user:$user /home/$user/sftp
+
 # Add public key
 mkdir -p /home/$user/.ssh
 echo $@ >> /home/$user/.ssh/authorized_keys
-chmod -R go-rwx /home/$user
-chown -R $user:$user /home/$user
+chown -R $user:$user /home/$user/.ssh
+chmod -R go-rx /home/$user/.ssh
