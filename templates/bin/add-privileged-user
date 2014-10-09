@@ -16,4 +16,5 @@ id $user &> /dev/null || adduser $user --disabled-password --gecos "Admin"
 chmod -R go-rwx /home/$user
 usermod -G $user,sudo $user
 usermod -s /bin/bash $user
+usermod -d /home/$user $user
 echo $user:$password | chpasswd
