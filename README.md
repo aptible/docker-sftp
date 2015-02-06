@@ -18,7 +18,7 @@ For example, given the admin user `aptible`, one might run:
 
 ### Specifying an admin user/password at runtime
 
-    docker run -e ADMIN_USER=aptible PASSWORD=foobar docker run quay.io/aptible/sftp
+    docker run -e ADMIN_USER=aptible -e PASSWORD=foobar quay.io/aptible/sftp
 
 ## Available Tags
 
