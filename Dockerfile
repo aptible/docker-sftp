@@ -10,18 +10,17 @@ RUN chmod +s /usr/bin/sudo
 RUN rm /etc/ssh/*_key /etc/ssh/*_key.pub
 
 ADD templates/etc /etc
-
 ADD templates/bin /usr/bin
-RUN chmod +x /usr/bin/start-sftp-server
 
-VOLUME /home
-VOLUME /etc/ssh/keys
+VOLUME ["/home", "/etc-backup", "/etc/ssh/keys", "/sftp"]
 
-EXPOSE 22
+ADD run-database.sh /usr/bin/
 
 # Integration tests
 RUN apt-get -y install sshpass
 ADD test /tmp/test
 RUN bats /tmp/test
 
-CMD /usr/bin/start-sftp-server
+EXPOSE 22
+
+ENTRYPOINT ["run-database.sh"]

@@ -16,7 +16,8 @@ teardown() {
 }
 
 wait_for_sftp() {
-  ADMIN_USER=admin PASSWORD=password /usr/bin/start-sftp-server &
+  USERNAME=admin PASSPHRASE=password run-database.sh --initialize
+  run-database.sh &
   while ! pgrep tail ; do sleep 0.1; done
 }
 
@@ -25,13 +26,7 @@ wait_for_sftp() {
   [[ "$output" =~ "OpenSSH_6.6.1p1" ]]
 }
 
-@test "It should fail without ADMIN_USER and PASSWORD " {
-  run /usr/bin/start-sftp-server
-  [[ "$status" -ne "0" ]]
-  [[ "$output" =~ '$ADMIN_USER and $PASSWORD must be set' ]]
-}
-
-@test "It should set ADMIN_USER and PASSWORD" {
+@test "It should create an admin account" {
   wait_for_sftp
   sshpass -p password sftp -o StrictHostKeyChecking=no admin@localhost << EOF
     ls
