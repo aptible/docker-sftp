@@ -1,1 +1,2 @@
-.dockeropts
+.docker/config.json
+*/Dockerfile
