@@ -23,7 +23,7 @@ The service is designed to run with an initial, password-protected admin user. A
 For example, given the admin user `aptible`, one might run:
 
     ssh -p <docker-port> aptible@<docker-host>
-    add-sftp-user regular-user <ssh-pubkey>
+    sudo add-sftp-user regular-user <ssh-pubkey>
 
 ## Available Tags
 
