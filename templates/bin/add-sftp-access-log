@@ -1,0 +1,49 @@
+#!/bin/bash
+# add-sftp-access-log [user]
+# If no user is specified, all users on the system will be enabled
+
+set -e
+
+enabled=0
+
+enable () {
+  user=${1}
+
+
+  if grep -q "${user}" /etc/rsyslog.d/sftp.conf; then
+    echo "User ${user} already found in /etc/rsyslog.d/sftp.conf!!"
+
+  else
+    # Add path to chroot for users specific socket
+    [ -d /home/$"user"/dev ] || mkdir -m2755 /home/"${user}"/dev
+    # Add this socket to the syslog configuration file
+    socketconfig='input(type="imuxsock" Socket="/home/'${user}'/dev/log" CreatePath="on")'
+    echo "${socketconfig}" >> /etc/rsyslog.d/sftp.conf
+    echo "${user} enabled"
+    (( enabled = enabled + 1 ))
+  fi
+}
+
+# No user specified, enable for all users found in /home/
+if [ $# -lt 1 ]; then
+
+  echo 'All users will have verbose acces logging enabled.'
+
+  for d in /home/*/; do
+      user=$(echo "${d}" | awk -F\/ '{print $3}')
+      enable "${user}"
+  done
+
+else # A user was specified
+  
+  echo "Enabling verbose logging for ${1}"
+  enable "${1}"
+
+fi
+
+# Restart rsyslog only if changes were made
+if [ ${enabled} -gt 0 ]; then
+  echo "${enabled} user(s) enabled!"
+  set +e
+  kill -15 $(cat /var/run/rsyslogd.pid); sleep 1; rsyslogd
+fi

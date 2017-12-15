@@ -5,10 +5,12 @@ teardown() {
   deluser test || true
   pkill sshd || true
   pkill rsyslogd || true
+  rm /var/run/rsyslogd.pid
   pkill tail || true
 
   rm -rf /home/admin
   rm -rf /home/test
+  sed -i '/input/d' /etc/rsyslog.d/sftp.conf
   rm -f /var/log/auth.log
 
   rm -f /etc/ssh/keys/*_key /etc/ssh/keys/*_key.pub

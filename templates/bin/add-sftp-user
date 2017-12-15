@@ -29,3 +29,5 @@ mkdir -p /home/$user/.ssh
 echo $@ >> /home/$user/.ssh/authorized_keys
 chown -R $user:$user /home/$user/.ssh
 chmod -R go-rx /home/$user/.ssh
+
+/usr/bin/add-sftp-access-log $user
