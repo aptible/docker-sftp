@@ -2,22 +2,27 @@
 # add-sftp-access-log [user]
 # If no user is specified, all users on the system will be enabled
 
-set -e
+set -o errexit
+set -o nounset
+
 
 enabled=0
 
 enable () {
-  user=${1}
-
+  local user="${1}"
+  local socketpath="/home/${user}/dev"
 
   if grep -q "${user}" /etc/rsyslog.d/sftp.conf; then
     echo "User ${user} already found in /etc/rsyslog.d/sftp.conf!!"
 
   else
     # Add path to chroot for users specific socket
-    [ -d /home/$"user"/dev ] || mkdir -m2755 /home/"${user}"/dev
+    if [[ ! -d "${socketpath}" ]]; then 
+      mkdir -m2755 "${socketpath}"
+    fi
+
     # Add this socket to the syslog configuration file
-    socketconfig='input(type="imuxsock" Socket="/home/'${user}'/dev/log" CreatePath="on")'
+    socketconfig="$(printf 'input(type="imuxsock" Socket="%s/log" CreatePath="on")', "${socketpath}")"
     echo "${socketconfig}" >> /etc/rsyslog.d/sftp.conf
     echo "${user} enabled"
     (( enabled = enabled + 1 ))
@@ -44,6 +49,8 @@ fi
 # Restart rsyslog only if changes were made
 if [ ${enabled} -gt 0 ]; then
   echo "${enabled} user(s) enabled!"
-  set +e
-  kill -15 $(cat /var/run/rsyslogd.pid); sleep 1; rsyslogd
+  set +o errexit
+  kill -TERM "$(cat /var/run/rsyslogd.pid)"
+  sleep 1
+  rsyslogd
 fi

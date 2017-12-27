@@ -69,7 +69,7 @@ EOF
 @test "It should allow SFTP for regular users" {
   # Quay appears to be changing file permissions...
   if [ ! $(stat --format '%a' $BATS_TEST_DIRNAME/test) == "600" ]; then
-    skip
+    chmod 600 $BATS_TEST_DIRNAME/test
   fi
 
   wait_for_sftp
@@ -85,3 +85,20 @@ EOF
   run ssh -i $BATS_TEST_DIRNAME/test -o StrictHostKeyChecking=no test@localhost
   [[ "$status" -ne "0" ]]
 }
+
+@test "It should log verbosely" {
+  # Quay appears to be changing file permissions...
+  if [ ! $(stat --format '%a' $BATS_TEST_DIRNAME/test) == "600" ]; then
+    chmod 600 $BATS_TEST_DIRNAME/test
+  fi
+
+  wait_for_sftp
+  /usr/bin/add-sftp-user test $(cat $BATS_TEST_DIRNAME/test.pub)
+  grep 'input(type="imuxsock" Socket="/home/test/dev/log" CreatePath="on")' /etc/rsyslog.d/sftp.conf
+  [[ -e /home/test/dev/log ]]
+  sftp -i $BATS_TEST_DIRNAME/test -o StrictHostKeyChecking=no test@localhost << EOF
+    mkdir testcreatedir
+EOF
+  grep 'testcreatedir' /var/log/auth.log
+}
+
