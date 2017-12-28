@@ -13,6 +13,10 @@ cp /etc-backup/* /etc
 rsyslogd
 /usr/sbin/sshd
 
+echo "Verbose logging enabled for all users by default"
+echo "Add user names, one per line, to '/home/.nolog' to disable for that user"
+set-access-log
+
 # Wait for /var/log/auth.log to exist, then tail it
 while [ ! -f /var/log/auth.log ] ; do sleep 0.1; done
 tail -f /var/log/auth.log

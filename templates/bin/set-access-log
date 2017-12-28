@@ -1,0 +1,49 @@
+#!/bin/bash
+# set-access-log [user]
+# If no user is specified, all users on the system will be enabled,
+# with the exception of any user with the file /home/$user/.nolog
+
+set -o errexit
+set -o nounset
+
+enabled=0
+sharedsocket="/home/.sharedlogsocket"
+
+enable () {
+  local user="${1}"
+  local home="/home/${user}"
+  local userdev="${home}/dev"
+  local usersocket="${userdev}/log"
+  local logblocker="/home/.nolog"
+
+  if [[ ! -d "${home}" ]]; then
+    echo "${user} doesn't seem to have a directory at ${home}"
+    exit 1
+  fi
+
+  # Allow some users to not be logged
+  if egrep "^${user}$" "${logblocker}"; then
+    echo "${user} will not be logged, remove the user from `${logblocker}` to allow it."
+    rm -rf "${usersocket}"
+
+  else
+    mkdir -p "${userdev}"
+    ln --force "${sharedsocket}" "${usersocket}"
+    echo "${user} will be logged."
+    (( enabled = enabled + 1 ))
+  fi
+}
+
+# No user specified, enable for all users found in /home/
+if [ $# -lt 1 ]; then
+
+  echo "All users will have verbose acces logging enabled, except those in listed in /home/.nolog"
+
+  for d in /home/*/; do
+      user=$(echo "${d}" | awk -F\/ '{print $3}')
+      enable "${user}"
+  done
+
+else # A user was specified
+  enable "${1}"
+fi

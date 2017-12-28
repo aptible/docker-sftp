@@ -10,7 +10,7 @@ teardown() {
 
   rm -rf /home/admin
   rm -rf /home/test
-  sed -i '/input/d' /etc/rsyslog.d/sftp.conf
+  rm -rf /home/.nolog
   rm -f /var/log/auth.log
 
   rm -f /etc/ssh/keys/*_key /etc/ssh/keys/*_key.pub
@@ -21,6 +21,7 @@ wait_for_sftp() {
   USERNAME=admin PASSPHRASE=password run-database.sh --initialize
   run-database.sh &
   while ! pgrep tail ; do sleep 0.1; done
+  while ! pgrep rsyslog ; do sleep 0.1; done
 }
 
 @test "It should install sshd " {
@@ -86,7 +87,7 @@ EOF
   [[ "$status" -ne "0" ]]
 }
 
-@test "It should log verbosely" {
+@test "It should log all SFTP access verbosely" {
   # Quay appears to be changing file permissions...
   if [ ! $(stat --format '%a' $BATS_TEST_DIRNAME/test) == "600" ]; then
     chmod 600 $BATS_TEST_DIRNAME/test
@@ -94,11 +95,63 @@ EOF
 
   wait_for_sftp
   /usr/bin/add-sftp-user test $(cat $BATS_TEST_DIRNAME/test.pub)
-  grep 'input(type="imuxsock" Socket="/home/test/dev/log" CreatePath="on")' /etc/rsyslog.d/sftp.conf
-  [[ -e /home/test/dev/log ]]
+  
   sftp -i $BATS_TEST_DIRNAME/test -o StrictHostKeyChecking=no test@localhost << EOF
     mkdir testcreatedir
 EOF
   grep 'testcreatedir' /var/log/auth.log
+
+
+  # ... even after a restart ...
+  kill -TERM "$(cat /var/run/rsyslogd.pid)"; sleep 1; rsyslogd
+  set-access-log test
+
+  sftp -i $BATS_TEST_DIRNAME/test -o StrictHostKeyChecking=no test@localhost << EOF
+    mkdir testcreatedir2
+EOF
+  grep 'testcreatedir2' /var/log/auth.log
 }
 
+@test "It should allow disabling verbose logging for SFTP users" {
+  # Quay appears to be changing file permissions...
+  if [ ! $(stat --format '%a' $BATS_TEST_DIRNAME/test) == "600" ]; then
+    chmod 600 $BATS_TEST_DIRNAME/test
+  fi
+
+  wait_for_sftp
+
+  /usr/bin/add-sftp-user test $(cat $BATS_TEST_DIRNAME/test.pub)
+
+  echo "test" >> /home/.nolog
+  set-access-log test
+
+  sftp -i $BATS_TEST_DIRNAME/test -o StrictHostKeyChecking=no test@localhost << EOF
+    mkdir testcreatedir3
+EOF
+  run grep 'testcreatedir3' /var/log/auth.log
+  [[ "$status" -ne "0" ]]
+}
+
+@test "It should prevent an SFTP user from disabling their own logging" {
+  # Quay appears to be changing file permissions...
+  if [ ! $(stat --format '%a' $BATS_TEST_DIRNAME/test) == "600" ]; then
+    chmod 600 $BATS_TEST_DIRNAME/test
+  fi
+
+  wait_for_sftp
+  /usr/bin/add-sftp-user test $(cat $BATS_TEST_DIRNAME/test.pub)
+
+  # Try to delete the socket
+  sftp -i $BATS_TEST_DIRNAME/test -o StrictHostKeyChecking=no test@localhost << EOF
+    rm /dev/log
+EOF
+  grep 'sent status Permission denied' /var/log/auth.log
+
+  # Try to upload a file over the socket
+  touch /home/test/log
+  sftp -i $BATS_TEST_DIRNAME/test -o StrictHostKeyChecking=no test@localhost << EOF
+    cd /dev
+    put /home/test/log
+EOF
+  grep 'sent status Failure' /var/log/auth.log
+}
