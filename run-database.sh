@@ -10,8 +10,15 @@ if [[ "$1" == "--initialize" ]]; then
 fi
 
 cp /etc-backup/* /etc
+
+# Ensure that rsyslogd creates the socket
+rm -f /home/.sharedlogsocket
 rsyslogd
 /usr/sbin/sshd
+
+echo "Verbose logging enabled for all users by default"
+echo "Add user names, one per line, to '/home/.nolog' to disable for that user"
+set-access-log
 
 # Wait for /var/log/auth.log to exist, then tail it
 while [ ! -f /var/log/auth.log ] ; do sleep 0.1; done
