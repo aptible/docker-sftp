@@ -9,23 +9,25 @@ if [ $# -lt 2 ]; then
 fi
 
 
-user=$1
+user="$1"
 shift
 
-id $user &> /dev/null || useradd $user
-adduser $user sftpusers || true
-passwd -d $user
-usermod -d /sftp $user
+id "$user" &> /dev/null || useradd "$user"
+adduser "$user" sftpusers || true
+passwd -d "$user"
+usermod -d /sftp "$user"
 
 # Set up home directory
-mkdir -p /home/$user
+mkdir -p "/home/$user"
 
 # Make chroot subdirectory
-mkdir -p /home/$user/sftp
-chown -R $user:$user /home/$user/sftp
+mkdir -p "/home/$user/sftp"
+chown -R "$user":"$user" "/home/$user/sftp"
 
 # Add public key
-mkdir -p /home/$user/.ssh
-echo $@ >> /home/$user/.ssh/authorized_keys
-chown -R $user:$user /home/$user/.ssh
-chmod -R go-rx /home/$user/.ssh
+mkdir -p "/home/$user/.ssh"
+echo $@ >> "/home/$user/.ssh/authorized_keys"
+chown -R "$user":"$user" "/home/$user/.ssh"
+chmod -R go-rx "/home/$user/.ssh"
+
+/usr/bin/set-access-log "$user"

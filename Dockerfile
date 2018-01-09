@@ -19,7 +19,8 @@ ADD run-database.sh /usr/bin/
 # Integration tests
 RUN apt-get -y install sshpass
 ADD test /tmp/test
-RUN bats /tmp/test
+# Ensure private key permissions are correct for testing
+RUN chmod 600 /tmp/test/testkey && bats /tmp/test
 
 EXPOSE 22
 

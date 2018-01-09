@@ -38,10 +38,10 @@ TCPKeepAlive yes
 
 UsePAM no
 
-Subsystem sftp internal-sftp
+Subsystem sftp internal-sftp -l INFO
 AllowTcpForwarding no
 
 Match Group sftpusers
   ChrootDirectory /home/%u
   AuthorizedKeysFile /home/%u/.ssh/authorized_keys
-  ForceCommand internal-sftp
+  ForceCommand internal-sftp -l INFO
