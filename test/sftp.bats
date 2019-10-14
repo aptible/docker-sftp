@@ -86,7 +86,7 @@ EOF
 @test "It should log all SFTP access verbosely" {
   wait_for_sftp
   /usr/bin/add-sftp-user test "$(cat $BATS_TEST_DIRNAME/testkey.pub)"
-  
+
   sftp -i $BATS_TEST_DIRNAME/testkey -o StrictHostKeyChecking=no test@localhost << EOF
     mkdir testcreatedir
 EOF
@@ -138,4 +138,8 @@ EOF
     put /home/test/log
 EOF
   grep 'sent status Failure' /var/log/auth.log
+}
+
+@test "It should disable RepeatedMsgReduction in rsyslog" {
+  grep -r "RepeatedMsgReduction off" /etc/rsyslog.d/
 }
