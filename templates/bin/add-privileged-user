@@ -19,4 +19,6 @@ usermod -s /bin/bash $user
 usermod -d /home/$user $user
 echo $user:$password | chpasswd
 
+cp /root/.bash_logout /home/$user/
+
 backup-users
