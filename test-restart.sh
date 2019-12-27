@@ -55,6 +55,10 @@ docker exec -it "$DB_CONTAINER" add-sftp-user bar bee
 docker exec -it "$DB_CONTAINER" id foo >/dev/null 2>&1
 docker exec -it "$DB_CONTAINER" id bar >/dev/null 2>&1
 
+echo "Modify the sshd config."
+docker exec -it "$DB_CONTAINER" bash -c "echo '#foobar' >> /etc/ssh/sshd_config"
+docker exec -it "$DB_CONTAINER" grep "foobar" /etc/ssh/sshd_config
+
 echo "Stopping DB"
 docker stop "$DB_CONTAINER"
 
@@ -69,3 +73,6 @@ docker exec -it "$DB_CONTAINER" id foo >/dev/null 2>&1
 
 echo "Checking the ephemeral user does not exist."
 ! docker exec -it "$DB_CONTAINER" id bar >/dev/null 2>&1
+
+echo "Ensure the sshd file is not still modified"
+! docker exec -it "$DB_CONTAINER" grep "foobar" /etc/ssh/sshd_config >/dev/null 2>&1
