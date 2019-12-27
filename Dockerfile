@@ -9,6 +9,7 @@ RUN chmod +s /usr/bin/sudo
 # Delete default host keys
 RUN rm /etc/ssh/*_key /etc/ssh/*_key.pub
 
+ENV SSHD_CONFIG_SHA1SUM ad2a2b17ecde36c7ff9b0c55f925754e881bd1f5
 ADD templates/etc /etc
 ADD templates/bin /usr/bin
 

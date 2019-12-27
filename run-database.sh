@@ -10,6 +10,12 @@ if [[ "$1" == "--initialize" ]]; then
 fi
 
 cp /etc-backup/* /etc
+cp /etc-backup/ssh/* /etc/ssh/
+
+echo "$SSHD_CONFIG_SHA1SUM /etc/ssh/sshd_config" | sha1sum -c - \
+  || echo "WARNING: unexpected hash for /etc/ssh/sshd_config. "\
+           "This _may_ be malicious, or you may have intended to "\
+           "change this file."
 
 # Ensure that rsyslogd creates the socket
 rm -f /home/.sharedlogsocket
