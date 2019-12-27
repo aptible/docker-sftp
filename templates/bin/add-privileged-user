@@ -18,3 +18,5 @@ usermod -G $user,sudo $user
 usermod -s /bin/bash $user
 usermod -d /home/$user $user
 echo $user:$password | chpasswd
+
+backup-users

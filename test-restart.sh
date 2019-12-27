@@ -45,12 +45,8 @@ docker run -d --rm --name="$DB_CONTAINER" \
 echo "Waiting for DB to come online"
 wait_for_db
 
-echo "Creating user and intentionally persisting."
+echo "Creating additional user."
 docker exec -it "$DB_CONTAINER" add-sftp-user foo fee
-docker exec -it "$DB_CONTAINER" cp /etc/{passwd,shadow,group} /etc-backup
-
-echo "Creating ephemeral user."
-docker exec -it "$DB_CONTAINER" add-sftp-user bar bee
 
 echo "Modify the sshd config."
 docker exec -it "$DB_CONTAINER" bash -c "echo '#foobar' >> /etc/ssh/sshd_config"
@@ -68,11 +64,8 @@ docker run -d --rm --name="$DB_CONTAINER" \
   "$IMG" >/dev/null 2>&1
 
 
-echo "Checking the persistent user does exist."
+echo "Checking the additional users do exist."
 docker exec -it "$DB_CONTAINER" id foo >/dev/null 2>&1
-
-echo "Checking the ephemeral user does not exist."
-! docker exec -it "$DB_CONTAINER" id bar >/dev/null 2>&1
 
 echo "Ensure the sshd file is not still modified"
 docker exec -it "$DB_CONTAINER" grep "foobar" /etc/ssh/sshd_config >/dev/null 2>&1

@@ -5,7 +5,7 @@ if [[ "$1" == "--initialize" ]]; then
   ssh-keygen -f /etc/ssh/keys/ssh_host_rsa_key -N '' -t rsa
   ssh-keygen -f /etc/ssh/keys/ssh_host_dsa_key -N '' -t dsa
   add-privileged-user $USERNAME $PASSPHRASE
-  cp /etc/{passwd,shadow,group} /etc-backup
+  backup-users
   exit
 fi
 
