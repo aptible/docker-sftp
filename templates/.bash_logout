@@ -8,5 +8,7 @@ fi
 
 
 if ! diff /etc/passwd /etc-backup/passwd &> /dev/null; then
-  echo "WARNING - you edited users without backing up the configuration."
+  echo "WARNING - you edited users without backing up the configuration.\
+  We will attempt to persist these at container exit, but you may run the command\
+  backup-users at any time to do so manually."
 fi
