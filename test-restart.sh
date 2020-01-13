@@ -38,37 +38,44 @@ docker run -it --rm \
   "$IMG" --initialize \
   >/dev/null 2>&1
 
-docker run -d --rm --name="$DB_CONTAINER" \
+docker run -d --name="$DB_CONTAINER" \
   --volumes-from "$DATA_CONTAINER" \
   "$IMG" >/dev/null 2>&1
 
 echo "Waiting for DB to come online"
 wait_for_db
 
-echo "Creating additional user."
-docker exec -it "$DB_CONTAINER" add-sftp-user foo fee
+docker exec "$DB_CONTAINER" mkdir /etc-backup/ssh
+
+echo "Creating additional users."
+docker exec "$DB_CONTAINER" add-sftp-user foo fee
+docker exec "$DB_CONTAINER" useradd bar
 
 echo "Modify the sshd config."
-docker exec -it "$DB_CONTAINER" bash -c "echo '#foobar' >> /etc/ssh/sshd_config"
+docker exec "$DB_CONTAINER" bash -c "echo '#foobar' >> /etc/ssh/sshd_config"
 
 echo "Persist the sshd config."
-docker exec -it "$DB_CONTAINER" mkdir /etc-backup/ssh
-docker exec -it "$DB_CONTAINER" cp /etc/ssh/sshd_config /etc-backup/ssh/
+docker exec "$DB_CONTAINER" cp /etc/ssh/sshd_config /etc-backup/ssh/
 
 echo "Stopping DB"
-docker stop "$DB_CONTAINER"
+docker stop "$DB_CONTAINER" >/dev/null 2>&1
 
-echo "Starting DB"
+echo "Check that SSHD was terminated."
+docker logs "$DB_CONTAINER" | grep "Received signal 15; terminating." >/dev/null 2>&1
+
+echo "Simulate deploy restart (volume persists, container recycled)"
+docker rm "$DB_CONTAINER" >/dev/null
 docker run -d --rm --name="$DB_CONTAINER" \
   --volumes-from "$DATA_CONTAINER" \
   "$IMG" >/dev/null 2>&1
 
 
 echo "Checking the additional users do exist."
-docker exec -it "$DB_CONTAINER" id foo >/dev/null 2>&1
+docker exec "$DB_CONTAINER" id foo >/dev/null 2>&1
+docker exec "$DB_CONTAINER" id bar >/dev/null 2>&1
 
 echo "Ensure the sshd file is not still modified"
-docker exec -it "$DB_CONTAINER" grep "foobar" /etc/ssh/sshd_config >/dev/null 2>&1
+docker exec "$DB_CONTAINER" grep "foobar" /etc/ssh/sshd_config >/dev/null 2>&1
 
 echo "Esnure we got warned that an un-expected sshd_config file was used"
 docker logs "$DB_CONTAINER" | grep 'WARNING: unexpected' >/dev/null 2>&1
