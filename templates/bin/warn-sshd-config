@@ -1,0 +1,13 @@
+#!/bin/bash
+
+diff /etc-backup/ssh/sshd_config /etc/ssh/sshd_config > /dev/null 2>&1
+diff_result="$?"
+
+echo "$SSHD_CONFIG_SHA1SUM /etc/ssh/sshd_config" | sha1sum -c - > /dev/null 2>&1
+hash_result="$?"
+
+if [ "$hash_result" -ne 0 ] && [ "$diff_result" -ne 0 ] ; then
+  echo "WARNING - changes detected in /etc/ssh/sshd_config. These changes "\
+    "will not be persisted after restart. If you wish for these changes to "\
+    "persist next restart, copy the sshd_config file to /etc-backup/sshd/"
+fi
