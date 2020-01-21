@@ -143,3 +143,7 @@ EOF
 @test "It should disable RepeatedMsgReduction in rsyslog" {
   grep -r "RepeatedMsgReduction off" /etc/rsyslog.d/
 }
+
+@test "The SHA1 sum of the sshd_config file is correct." {
+  echo "$SSHD_CONFIG_SHA1SUM /etc/ssh/sshd_config" | sha1sum -c -
+}

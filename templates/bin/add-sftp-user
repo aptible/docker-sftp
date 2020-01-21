@@ -31,3 +31,5 @@ chown -R "$user":"$user" "/home/$user/.ssh"
 chmod -R go-rx "/home/$user/.ssh"
 
 /usr/bin/set-access-log "$user"
+
+backup-users
