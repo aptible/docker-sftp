@@ -27,7 +27,7 @@ wait_for_sftp() {
 
 @test "It should install sshd " {
   run /usr/sbin/sshd -v
-  [[ "$output" =~ "OpenSSH_6.6.1p1" ]]
+  [[ "$output" =~ "OpenSSH_7.2p2" ]]
 }
 
 @test "It should create an admin account" {
