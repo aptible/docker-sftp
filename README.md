@@ -27,7 +27,7 @@ For example, given the admin user `aptible`, one might run:
 
 ## Available Tags
 
-* `latest`: Currently OpenSSH 6.6.1p1
+* `latest`: Currently OpenSSH 7.2p2
 
 ## Tests
 

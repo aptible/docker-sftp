@@ -1,7 +1,9 @@
-FROM quay.io/aptible/ubuntu:14.04
+FROM quay.io/aptible/ubuntu:16.04
+
+ENV SUDO_MIN 1.8.16-0ubuntu1.10
 
 RUN apt-get update
-RUN apt-get -y install openssh-server rssh sudo
+RUN apt-get -y install openssh-server rssh sudo rsyslog
 RUN mkdir -p /var/run/sshd
 RUN groupadd sftpusers
 RUN chmod +s /usr/bin/sudo

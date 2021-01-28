@@ -23,6 +23,8 @@ cp /etc-backup/ssh/* /etc/ssh/
 
 # Ensure that rsyslogd creates the socket
 rm -f /home/.sharedlogsocket
+# Ensure /var/log is owned by the syslog group, since the GID changed
+chgrp syslog /var/log
 rsyslogd
 /usr/sbin/sshd
 
